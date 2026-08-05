@@ -15,25 +15,68 @@ As deepfake technology becomes more realistic and widely available, it is increa
 - Design a simple, secure, and user-friendly interface
 - Minimize data retention and handle uploads safely
 
-## Potential Tech Stack yet to be decided
-
-### Frontend
-- TypeScript
-- React or Next.js
-- Tailwind CSS
-
-### Backend
-- Python
-- FastAPI
-
-### Model / Detection
-- PyTorch
-- Pre-trained deepfake detection model
-
-## Team Roles
+## Team 
 
 - Rojin Osia - Backend Developer
 - Nattharut Natvongsaku - Frontend Developer and UX/UI Designer
 - Lucy Kwak - Product Research, Backend Development, and Frontend Support
-- Hyun Joon Kim - Project Coordination, Backend Development, and System Integration
+- Terry Kim - Project Coordination, Backend Development, and System Integration
+
+
+## Tech Stack
+
+### Frontend
+- TypeScript
+- React 18
+- Vite
+- CSS3 
+
+### Backend
+- Python
+- FastAPI
+- Uvicorn
+
+### Detection (Current)
+- Mock deterministic scoring engine (returns consistent results for the same file)
+
+### Storage & Auth (Planned)
+- Firebase Authentication — email/password and Google OAuth login
+- Firebase Firestore — user profiles and saved result metadata
+
+### Detection Model (Planned)
+- SightEngine API — pre-trained deepfake detection model integration
+- PyTorch — custom model training and deployment
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-org/deepfake-detection.git
+cd deepfake-detection
+```
+
+### 2. Start the backend
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python main.py                # Runs on http://localhost:8000
+```
+
+### 3. Start the frontend
+```bash
+cd frontend
+npm install
+npm run dev                   # Runs on http://localhost:5173
+```
+
+The Vite dev server proxies `/api` requests to the backend automatically.
+
 
