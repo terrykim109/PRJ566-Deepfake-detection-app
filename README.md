@@ -37,7 +37,9 @@ As deepfake technology becomes more realistic and widely available, it is increa
 - Uvicorn
 
 ### Detection (Current)
-- Mock deterministic scoring engine (returns consistent results for the same file)
+- Not implemented. The backend exposes only `GET /api/health`; the frontend
+  displays a fixed mock result from `frontend/src/data/mock.ts` and does not
+  call the backend yet.
 
 ### Storage & Auth (Planned)
 - Firebase Authentication — email/password and Google OAuth login
@@ -53,12 +55,12 @@ As deepfake technology becomes more realistic and widely available, it is increa
 
 ### Prerequisites
 - Python 3.10+
-- Node.js 18+
+- Node.js 20.19+ or 22.12+ (required by Vite 8)
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-org/deepfake-detection.git
-cd deepfake-detection
+git clone https://github.com/terrykim109/PRJ566-Deepfake-detection-app.git
+cd PRJ566-Deepfake-detection-app
 ```
 
 ### 2. Start the backend
@@ -77,6 +79,11 @@ npm install
 npm run dev                   # Runs on http://localhost:5173
 ```
 
-The Vite dev server proxies `/api` requests to the backend automatically.
+The Vite dev server is configured to proxy `/api` requests to the backend on
+port 8000. The frontend does not make any API calls yet, so the backend is not
+required to run the UI.
+
+See **[`frontend/README.md`](frontend/README.md)** for the frontend: the route ↔
+Figma node map, the design tokens, and the deliberate deviations from the design.
 
 
