@@ -1,5 +1,5 @@
 # Deepfake Detection Application
-# Sprint 4 Demo — Login, Account Creation, and Profile Pages with Firebase CRUD
+## Sprint 4 Demo — Login, Account Creation, and Profile Pages with Firebase CRUD ##
 
 ## Overview
 
