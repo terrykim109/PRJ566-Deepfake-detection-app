@@ -1,4 +1,5 @@
 # Deepfake Detection Application
+## Sprint 4 Demo — Login, Account Creation, and Profile Pages with Firebase CRUD ##
 
 ## Overview
 
@@ -36,10 +37,8 @@ As deepfake technology becomes more realistic and widely available, it is increa
 - FastAPI
 - Uvicorn
 
-### Detection (Current)
-- Not implemented. The backend exposes only `GET /api/health`; the frontend
-  displays a fixed mock result from `frontend/src/data/mock.ts` and does not
-  call the backend yet.
+### Detection (Planned)
+- OpenRouter API — vision model inference for media analysis and confidence scoring
 
 ### Storage & Auth (Planned)
 - Firebase Authentication — email/password and Google OAuth login
