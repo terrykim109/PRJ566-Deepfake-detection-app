@@ -1,508 +1,725 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
 
+/* ───────────────────────────────────────────────
+   Design tokens — exact values from the Figma
+   Style Guide frame (node 3:51)
+   ─────────────────────────────────────────────── */
 :root {
-  /* Logo-matched blue palette */
-  --navy: #0d4a8a;
-  --navy-light: #1565c0;
-  --navy-dark: #08306b;
-  --accent-blue: #42a5f5;
+  --primary: #17324d;
+  --secondary: #2f6fed;
+  --accent: #20a39e;
+  --background: #f6f8fb;
+  --text: #182230;
+  --secondary-text: #5d6978;
+  --borders: #d8e0ea;
+  --successful: #16845b;
+  --warning: #c9a227;
+  --error: #c63c45;
 
-  --bg: #eef1f5;
-  --card-bg: #ffffff;
-  --text: #1a1a1a;
-  --text-secondary: #5a5a5a;
-  --muted: #d5d9df;
-  --accent: #3b82f6;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
+  /* Recurring literals from the screens */
+  --btn-dark: #060326;      /* every filled button in the design */
+  --placeholder: #d9d9d9;   /* drop zone, tips panel, score ellipse, modals */
+  --nav-inactive: #b8c0cc;  /* unselected nav tab */
+  --field-bg: #f9f9f9;      /* profile inputs */
+  --hairline: #c9c9c9;      /* auth field underlines / social buttons */
+  --muted-label: #9d9d9d;   /* auth field labels */
+
+  /* Telegraf is a licensed font and is not bundled; Inter is the
+     closest available fallback for the screens that specify it. */
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-poppins: 'Poppins', var(--font-body);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
+  font-family: var(--font-body);
+  background: var(--background);
   color: var(--text);
-  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Layout */
-.app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+a { text-decoration: none; color: inherit; }
+input { font-family: inherit; }
+
+/* The Figma canvas is a fixed 1440×1024 artboard. The stage keeps that
+   exact geometry so spacing matches the design 1:1. */
+.stage {
+  width: 1440px;
+  min-height: 1024px;
+  margin: 0 auto;
+  position: relative;
+  background: var(--background);
 }
 
-/* Header */
-.header {
-  background: var(--card-bg);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 32px;
-  border-bottom: 1px solid #e2e5e9;
-}
+/* ───────────── Header (logo + account) ───────────── */
+.app-header { position: relative; height: 148px; }
 
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo-img {
-  height: 52px;
-  width: auto;
+.app-logo {
+  position: absolute;
+  left: 64px;
+  top: 0;
+  width: 160px;
+  height: 160px;
   display: block;
 }
+.app-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-.user-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+.account-btn {
+  position: absolute;
+  left: 1326px;
+  top: 62px;
+  width: 53px;
+  height: 52px;
+  padding: 0;
+  display: block;
 }
+.account-btn img { width: 100%; height: 100%; }
+.account-btn:hover { opacity: 0.75; }
 
-/* Nav */
+/* ───────────── Nav bar ───────────── */
 .nav-bar {
-  background: var(--navy);
+  position: relative;
+  margin: 0 64px;
+  height: 64px;
+  background: var(--primary);
   display: flex;
-  gap: 0;
-  padding: 0 32px;
+  align-items: stretch;
 }
 
 .nav-tab {
-  padding: 14px 28px;
-  color: rgba(255,255,255,0.65);
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  transition: all 0.2s;
-  border-bottom: 3px solid transparent;
-}
-
-.nav-tab:hover {
-  color: rgba(255,255,255,0.9);
-}
-
-.nav-tab.active {
-  color: #fff;
-  border-bottom-color: #fff;
-}
-
-/* Main */
-.main {
-  flex: 1;
-  padding: 32px;
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-}
-
-.page-title {
-  font-size: 32px;
+  width: 155px;
+  height: 64px;
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: 24px;
+  color: var(--nav-inactive);
+  transition: color 0.15s;
+}
+.nav-tab:hover { color: #e6ebf2; }
+.nav-tab.active { color: #ffffff; }
+
+/* Landing variant: auth buttons sit at the right of the bar */
+.nav-auth { margin-left: auto; display: flex; align-items: center; gap: 26px; padding-right: 28px; }
+
+.nav-btn {
+  background: var(--btn-dark);
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  padding: 12px;
+  color: #f5f5f5;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.nav-btn:hover { background: #120b3d; }
+
+/* ───────────── Shared page furniture ───────────── */
+/* Height is fixed so the card below lands on the Figma's y=408. */
+.page-title {
+  font-size: 52px;
+  font-weight: 700;
+  color: #000;
+  padding: 78px 0 0 69px;
+  height: 196px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--borders);
+  border-radius: 20px;
+}
+
+/* Primary filled button, matching every CTA in the design */
+.btn {
+  background: var(--btn-dark);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.28px;
+  padding: 16px 28px;
+  transition: background 0.15s, opacity 0.15s;
+}
+.btn:hover { background: #120b3d; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--borders);
   color: var(--text);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 16px 28px;
+}
+.btn-ghost:hover { background: #eef2f7; }
+
+/* ───────────── Landing ───────────── */
+.landing-card { margin: 60px 64px 0; height: 579px; position: relative; }
+
+/* margin-left, not padding-left — border-box would otherwise eat into
+   the 1064px the 48px headline needs to stay on one line. */
+.landing-heading {
+  margin-left: 185px;
+  width: 1064px;
+  height: 177px;
+  padding-top: 17px;
+  font-weight: 700;
+  color: #000;
+}
+.landing-heading .l1 { font-size: 48px; line-height: normal; }
+.landing-heading .l2 { font-size: 32px; line-height: normal; }
+
+.landing-tiles {
+  display: flex;
+  gap: 90px;
+  padding-left: 159px;
+}
+.landing-tile {
+  width: 469px;
+  height: 268px;
+  border: 1px solid var(--borders);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 700;
+  color: #000;
+  background: #fff;
+  overflow: hidden;
+}
+.landing-tile img { width: 100%; height: 100%; object-fit: cover; }
+
+.landing-cta { display: flex; justify-content: center; padding-top: 40px; }
+.landing-cta .btn { width: 207px; height: 57px; padding: 0; letter-spacing: normal; }
+
+/* ───────────── Auth (Log in / Create account) ───────────── */
+.auth-page { display: flex; min-height: 1024px; }
+
+.auth-aside {
+  width: 521px;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.auth-aside img { width: 310px; height: 310px; object-fit: contain; }
+
+.auth-main { flex: 1; padding: 170px 145px 0 161px; }
+
+.auth-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1.92px;
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.auth-title::after {
+  content: '';
+  flex: 1;
+  max-width: 100px;
+  height: 1px;
+  background: #000;
 }
 
-/* Card */
-.card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-}
+.social-row { display: flex; gap: 55px; margin-top: 43px; }
 
-/* Upload Grid */
-.upload-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 32px;
-  align-items: start;
+.social-btn {
+  width: 279px;
+  height: 67px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding: 0 19px;
+  background: #fff;
 }
+.social-btn:hover { background: #fafbfd; }
+.social-btn img { width: 32px; height: 33px; flex-shrink: 0; }
+.social-btn span { font-size: 12px; letter-spacing: 0.96px; color: #606060; }
 
-@media (max-width: 900px) {
-  .upload-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Drop Zone */
-.drop-zone {
-  border: 2px dashed var(--muted);
-  border-radius: 12px;
-  padding: 60px 24px;
+.auth-or {
   text-align: center;
-  background: #f8f9fb;
-  transition: all 0.2s;
-  cursor: pointer;
+  font-size: 18px;
+  letter-spacing: 1.44px;
+  color: #a3a3a3;
+  margin: 40px 0 0;
 }
 
-.drop-zone.dragover {
-  border-color: var(--accent-blue);
-  background: #e3f2fd;
+.field { position: relative; margin-top: 30px; }
+.field input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
+  font-size: 16px;
+  letter-spacing: 1.28px;
+  color: var(--text);
+  padding: 8px 0 14px;
+  outline: none;
+}
+.field input::placeholder { color: var(--muted-label); }
+.field input:focus { border-bottom-color: var(--primary); }
+
+.field-toggle {
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  width: 27px;
+  height: 27px;
+  border: 1px solid var(--hairline);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.field-toggle img { width: 100%; height: 100%; }
+
+.auth-submit {
+  width: 100%;
+  height: 72px;
+  margin-top: 57px;
+  padding: 0;
+  font-weight: 700;
 }
 
-.drop-zone-text {
-  font-size: 20px;
-  color: var(--text-secondary);
-  font-weight: 300;
+.auth-links { margin-top: 15px; }
+.auth-links p {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.28px;
+  color: var(--muted-label);
+  line-height: 35px;
 }
+.auth-links a { color: var(--text); text-decoration: underline; }
 
-.drop-zone-hint {
-  font-size: 13px;
-  color: #999;
-  margin-top: 8px;
-}
-
-.file-input {
-  display: none;
-}
-
-/* Tips Sidebar */
-.tips-panel {
-  background: #e8eaed;
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.tips-title {
+.auth-error {
+  margin-top: 16px;
+  color: var(--error);
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-align: center;
-  margin-bottom: 20px;
   letter-spacing: 0.5px;
 }
 
-.tip-item {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  margin-bottom: 14px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
+/* ───────────── Upload ───────────── */
+.upload-card { margin: 0 81px; height: 551px; position: relative; }
 
-.tip-check {
-  width: 18px;
-  height: 18px;
-  min-width: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1px;
-}
+.upload-grid { display: flex; padding: 76px 0 0 152px; gap: 57px; align-items: flex-start; }
 
-.tip-check svg {
-  width: 10px;
-  height: 10px;
-}
+/* Left column holds the drop zone, the step tracker and the actions,
+   matching the Figma where all three sit inside the card. */
+.upload-col { width: 739px; }
+.upload-steps { padding-top: 34px; }
 
-/* Steps */
-.steps-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  margin-top: 36px;
-}
-
-.step {
+.drop-zone {
+  width: 739px;
+  height: 234px;
+  background: rgba(217, 217, 217, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.15s, outline-color 0.15s;
+  outline: 2px dashed transparent;
+  outline-offset: -6px;
 }
+.drop-zone:hover { background: rgba(217, 217, 217, 0.72); }
+.drop-zone.dragging {
+  background: rgba(47, 111, 237, 0.12);
+  outline-color: var(--secondary);
+}
+.drop-zone-text { font-size: 32px; font-weight: 200; color: #000; }
+.drop-zone-hint { font-size: 14px; font-weight: 300; color: var(--secondary-text); }
+.drop-zone img.preview { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+/* Figma puts the tips panel 12px above the drop zone (y=472 vs 484). */
+.tips-panel {
+  width: 335px;
+  height: 383px;
+  margin-top: -12px;
+  background: var(--placeholder);
+  padding: 26px 30px;
+}
+.tips-title { font-size: 14px; font-weight: 200; color: #000; text-align: center; margin-bottom: 22px; }
+.tips-lead { font-size: 14px; font-weight: 200; color: #000; margin-bottom: 18px; }
+.tip-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
+.tip-row img { width: 24px; height: 25px; flex-shrink: 0; }
+.tip-row span { font-size: 14px; font-weight: 200; color: #000; line-height: normal; }
+
+/* Added control — not present in the Figma upload frame (see README) */
+.upload-actions { display: flex; gap: 16px; justify-content: center; padding-top: 24px; }
+
+/* Detection failure — no Figma frame covers it (see README) */
+.upload-error {
+  padding-top: 20px;
+  text-align: center;
+  color: var(--error);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+/* ───────────── Step indicator ───────────── */
+.steps { display: flex; align-items: center; justify-content: center; gap: 0; }
 
 .step-circle {
-  width: 80px;
-  height: 80px;
+  width: 128px;
+  height: 115px;
   border-radius: 50%;
+  background: var(--placeholder);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  transition: all 0.3s;
+  gap: 8px;
+  flex-shrink: 0;
+  transition: background 0.25s;
 }
+.step-circle.active { background: var(--secondary-text); }
+.step-circle img { width: 34px; height: 34px; }
+.step-circle span { font-size: 12px; font-weight: 700; color: #fff; }
 
-.step-circle.inactive {
-  background: var(--muted);
-  color: #888;
-}
-
-.step-circle.active {
-  background: #5a7fa8;
-  color: #fff;
-}
-
-.step-circle.complete {
-  background: var(--navy);
-  color: #fff;
-}
-
-.step-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.step-arrow {
-  width: 60px;
-  height: 2px;
-  background: var(--muted);
-  margin: 0 8px;
-  position: relative;
-  top: -14px;
-}
-
+.step-arrow { width: 155px; height: 2px; background: #000; position: relative; flex-shrink: 0; }
 .step-arrow::after {
   content: '';
   position: absolute;
   right: -1px;
-  top: -3px;
-  width: 0;
-  height: 0;
-  border-left: 6px solid var(--muted);
-  border-top: 4px solid transparent;
-  border-bottom: 4px solid transparent;
+  top: -4px;
+  border-left: 9px solid #000;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
 }
 
-/* Error */
-.error-box {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-/* Processing */
+/* ───────────── Processing ───────────── */
 .processing-box {
-  text-align: center;
-  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  height: 234px;
+  width: 739px;
+  background: rgba(217, 217, 217, 0.5);
 }
-
 .spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--muted);
-  border-top-color: var(--navy);
+  width: 56px;
+  height: 56px;
+  border: 5px solid rgba(93, 105, 120, 0.25);
+  border-top-color: var(--primary);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
+  animation: spin 0.9s linear infinite;
 }
+@keyframes spin { to { transform: rotate(360deg); } }
+.processing-text { font-size: 32px; font-weight: 200; color: #000; }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.processing-text {
-  font-size: 18px;
-  color: var(--text-secondary);
-  font-weight: 300;
-}
-
-/* Results */
-.results-layout {
-  display: grid;
-  grid-template-columns: 180px 1fr 160px;
-  gap: 28px;
-  align-items: start;
-}
-
-@media (max-width: 800px) {
-  .results-layout {
-    grid-template-columns: 1fr;
-  }
-}
+/* ───────────── Results ───────────── */
+.results-card { margin: 21px 64px 0; height: 731px; position: relative; }
 
 .result-thumb {
-  width: 180px;
-  height: 180px;
-  border-radius: 16px;
-  object-fit: cover;
-  background: var(--muted);
-}
-
-.result-text-box {
-  background: #e8eaed;
-  border-radius: 16px;
-  padding: 24px;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text);
-}
-
-.result-verdict {
-  font-weight: 700;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-.result-explanation {
-  margin-bottom: 12px;
-}
-
-.result-disclaimer {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-style: italic;
-  border-top: 1px solid #d1d5db;
-  padding-top: 10px;
-  margin-top: 10px;
-}
-
-.score-circle {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: #e8eaed;
+  width: 184px;
+  height: 177px;
+  border-radius: 20px;
+  background: var(--placeholder);
+  margin: 84px 0 0 128px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 52px;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0 auto;
+  overflow: hidden;
 }
+.result-thumb img.icon { width: 40px; height: 40px; }
+.result-thumb img.shot { width: 100%; height: 100%; object-fit: cover; }
 
-.score-label {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
+.result-body { display: flex; align-items: flex-start; gap: 104px; padding: 51px 0 0 128px; }
+
+.result-text {
+  width: 747px;
+  min-height: 207px;
+  background: var(--placeholder);
+  border-radius: 20px;
+  padding: 9px 4px 9px 4px;
+  font-size: 12px;
+  color: #000;
+  line-height: normal;
 }
+.result-text p { margin-bottom: 12px; }
+.result-text p:last-child { margin-bottom: 0; }
 
-/* Buttons */
-.btn {
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background: var(--navy);
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: var(--navy-light);
-}
-
-.btn-secondary {
-  background: var(--muted);
-  color: var(--text);
-}
-
-.btn-secondary:hover {
-  background: #c5c9cf;
-}
-
-.actions {
+.score {
+  width: 213px;
+  height: 174px;
+  border-radius: 50%;
+  background: var(--placeholder);
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
+.score span { font-size: 80px; font-weight: 700; color: #000; opacity: 0.87; line-height: 1; }
 
-/* History */
-.history-list {
+.results-steps { padding-top: 56px; }
+
+/* Added controls — not present in the Figma results frame (see README).
+   Anchored under the score ellipse, which the design leaves empty, so
+   the card keeps its 731px height and the step tracker stays put. */
+.results-actions {
+  position: absolute;
+  right: 120px;
+  top: 500px;
+  width: 213px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.history-item {
-  background: #f8f9fb;
-  border-radius: 12px;
-  padding: 16px 20px;
+/* ───────────── Result detail (from history) ───────────── */
+.detail-card { margin: 57px 64px 0; height: 706px; position: relative; padding: 69px 0 0 120px; }
+
+.detail-save {
+  position: absolute;
+  right: 63px;
+  top: 50px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+}
+.detail-save img { width: 100%; height: 100%; }
+.detail-save:hover { opacity: 0.6; }
+
+.detail-text {
+  width: 1092px;
+  margin-top: 35px;
+  font-size: 24px;
+  text-align: center;
+  color: #000;
+  line-height: normal;
+}
+
+.detail-meta { margin-top: 26px; font-size: 20px; color: var(--secondary-text); }
+
+/* ───────────── History ───────────── */
+.history-card { margin: 84px 81px 0; height: 579px; position: relative; padding: 32px 0 0; }
+
+.history-toolbar { display: flex; justify-content: flex-end; padding-right: 75px; }
+
+.sort-select {
+  width: 150px;
+  height: 28px;
+  border: none;
+  border-bottom: 1px solid var(--borders);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 0 4px 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.history-list {
+  margin: 31px 64px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 39px;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+.history-list::-webkit-scrollbar { width: 12px; }
+.history-list::-webkit-scrollbar-thumb { background: #c3ccd8; border-radius: 6px; }
+
+.history-row {
+  min-height: 125px;
+  background: #fff;
+  border: 1px solid var(--borders);
+  border-radius: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 0 24px 0 23px;
   gap: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
 }
+.history-row:hover { border-color: #b9c8db; box-shadow: 0 2px 10px rgba(23, 50, 77, 0.08); }
 
-.history-info {
-  flex: 1;
-}
+.history-row-info { flex: 1; font-size: 24px; color: #000; line-height: normal; }
+.history-row-verdict.real { color: var(--successful); }
+.history-row-verdict.warn { color: var(--warning); }
+.history-row-verdict.fake { color: var(--error); }
 
-.history-date {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.history-verdict {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.history-score {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--navy);
-  min-width: 60px;
-  text-align: right;
-}
+.history-delete { width: 30px; height: 28px; padding: 0; flex-shrink: 0; }
+.history-delete img { width: 100%; height: 100%; }
+.history-delete:hover { opacity: 0.55; }
 
 .history-empty {
   text-align: center;
-  padding: 60px;
-  color: var(--text-secondary);
-}
-
-.delete-btn {
-  background: none;
-  border: none;
-  color: #ef4444;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 4px 8px;
-}
-
-.delete-btn:hover {
-  text-decoration: underline;
-}
-
-/* Placeholder / Skeleton states */
-.placeholder-box {
-  text-align: center;
-  padding: 80px 24px;
-  color: var(--text-secondary);
-}
-
-.placeholder-title {
+  padding: 120px 0;
+  color: var(--secondary-text);
   font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: var(--text);
 }
 
-.placeholder-sub {
-  font-size: 14px;
-  color: var(--text-secondary);
+.toast {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -66px;
+  width: 579px;
+  height: 98px;
+  background: #fff;
+  border: 1px solid var(--borders);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--successful);
+  box-shadow: 0 4px 16px rgba(23, 50, 77, 0.1);
+}
+
+/* ───────────── Modal ───────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(24, 34, 48, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  width: 836px;
+  height: 423px;
+  background: var(--placeholder);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-bar {
+  height: 32px;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  flex-shrink: 0;
+}
+.modal-close {
+  width: 24px;
+  height: 26px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-close:hover { opacity: 0.7; }
+
+.modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 40px;
+}
+.modal-title { font-size: 48px; font-weight: 700; color: #000; text-align: center; }
+.modal-sub { font-size: 24px; color: #000; text-align: center; }
+
+.modal-actions { display: flex; gap: 75px; padding-bottom: 53px; justify-content: center; }
+.modal-btn {
+  width: 155px;
+  height: 47px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
+.modal-btn.confirm { background: var(--successful); }
+.modal-btn.confirm:hover { background: #126e4b; }
+.modal-btn.cancel { background: var(--error); }
+.modal-btn.cancel:hover { background: #ac3038; }
+
+/* ───────────── Profile ───────────── */
+.profile-head { display: flex; flex-direction: column; align-items: center; padding-top: 29px; }
+
+.profile-avatar {
+  width: 231px;
+  height: 231px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e9edf2;
+}
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.profile-name { font-size: 52px; font-weight: 700; color: #000; margin-top: 16px; }
+
+.profile-card {
+  margin: 19px 82px 0;
+  height: 317px;
+  border: 1px solid var(--borders);
+  border-radius: 20px;
+  background: #fff;
+  padding: 40px 54px;
+  display: grid;
+  grid-template-columns: 508px 502px;
+  gap: 41px 85px;
+  align-content: start;
+}
+
+.profile-field label {
+  display: block;
+  font-family: var(--font-poppins);
+  font-size: 16px;
+  color: #000;
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+.profile-field input {
+  width: 100%;
+  height: 53px;
+  background: var(--field-bg);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-family: var(--font-poppins);
+  font-size: 16px;
+  color: #000;
+  outline: none;
+}
+.profile-field input::placeholder { color: #000; opacity: 0.4; }
+.profile-field input:focus { border-color: var(--secondary); background: #fff; }
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin: 38px 79px 0 0;
+}
+.profile-actions .btn {
+  width: 264px;
+  height: 72px;
+  padding: 0;
+  font-family: var(--font-poppins);
+}
+.profile-actions .btn-ghost { height: 72px; padding: 0 34px; font-family: var(--font-poppins); }
+
+.profile-saved {
+  color: var(--successful);
+  font-size: 16px;
+  font-weight: 600;
+  align-self: center;
+  margin-right: auto;
+  margin-left: 82px;
 }
