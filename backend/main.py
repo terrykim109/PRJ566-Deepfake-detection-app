@@ -5,19 +5,23 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from firebase_config import db
 from routers import auth
+from routers import users
 
 app = FastAPI(title="Deepfake Detection API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=600,
 )
 
 # Include auth router
 app.include_router(auth.router, prefix="/api")
+app.include_router(users.router, prefix="/api")
 
 # Health check endpoint
 @app.get("/api/health")

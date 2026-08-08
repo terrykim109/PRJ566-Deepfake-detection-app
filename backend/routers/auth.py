@@ -1,6 +1,4 @@
-#routers/auth.py
-
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from firebase_config import db
 
 from schemas import UserCreate, UserLogin, UserResponse, TokenResponse
@@ -10,10 +8,16 @@ router = APIRouter(tags=["auth"])
 
 users_ref = db.collection("users")
 
-# Signup endpoint
+@router.options("/auth/login")
+async def options_login(request: Request):
+    return {}
+
+@router.options("/auth/signup")
+async def options_signup(request: Request):
+    return {}
+
 @router.post("/auth/signup", response_model=TokenResponse)
 async def signup(body: UserCreate):
-    # Check for duplicate email
     existing = users_ref.where("email", "==", body.email).limit(1).get()
     if existing:
         raise HTTPException(
@@ -34,17 +38,13 @@ async def signup(body: UserCreate):
 
     log_event("auth_signup", f"User {user_id} created", user_id)
 
-    # Returning a mock token for now..
     return TokenResponse(
         access_token=f"mock_token_{user_id}",
         user=UserResponse(id=user_id, **user_doc)
     )
 
-# Login endpoint
 @router.post("/auth/login", response_model=TokenResponse)
 async def login(body: UserLogin):
-
-    # Find user by email
     docs = users_ref.where("email", "==", body.email).limit(1).get()
     if not docs:
         raise HTTPException(
@@ -55,8 +55,6 @@ async def login(body: UserLogin):
     user_doc = docs[0].to_dict()
     user_id = user_doc["user_id"]
 
-    # Accept any password for now.
-
     log_event("auth_login", f"User {user_id} logged in", user_id)
 
     return TokenResponse(
@@ -64,25 +62,19 @@ async def login(body: UserLogin):
         user=UserResponse(id=user_id, **user_doc)
     )
 
-# Logout endpoint
 @router.post("/auth/logout")
 async def logout(user_id: str | None = None):
-
     if user_id:
         log_event("auth_logout", f"User {user_id} logged out", user_id)
-
     return {"message": "Logged out successfully"}
 
-# Get current user endpoint
 @router.get("/auth/me", response_model=UserResponse)
 async def get_current_user(user_id: str):
-
     doc = users_ref.document(user_id).get()
     if not doc.exists:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-
     data = doc.to_dict()
     return UserResponse(id=doc.id, **data)
