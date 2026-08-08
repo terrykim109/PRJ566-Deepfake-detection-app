@@ -1,31 +1,7 @@
-# Dependencies
 node_modules/
 
-# Build output
-dist/
-
-# Python (backend)
-__pycache__/
-*.py[cod]
-venv/
-.venv/
-
-# Secrets — Firebase and SightEngine keys land here
-.env
-.env.*
-!.env.example
-
-# Logs
-*.log
-npm-debug.log*
-
-# Editors
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Claude Code local overrides
-.claude/settings.local.json
+# Backend
+backend/serviceAccountKey.json
+backend/venv/
+backend/__pycache__/
+backend/*.pyc

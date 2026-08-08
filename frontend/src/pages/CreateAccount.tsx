@@ -1,63 +1,60 @@
+// CreateAccount.tsx
+
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppState } from '../state/AppState'
 
-/* Figma frame "Create Account" (node 9:8): same split layout as Log In
-   with an extra Full Name field. */
 export const CreateAccount: React.FC = () => {
   const navigate = useNavigate()
-  const { signIn } = useAppState()
+  const { signUp, error, clearError, loading } = useAppState()
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
+  const [localError, setLocalError] = useState('')
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLocalError('')
+    clearError()
+
     const form = e.target as HTMLFormElement
-    const values = ['name', 'email', 'password'].map((n) =>
-      (form.elements.namedItem(n) as HTMLInputElement).value.trim(),
-    )
-    if (values.some((v) => !v)) {
-      setError('Fill in every field to create your account.')
+    const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim()
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim()
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value.trim()
+
+    if (!name || !email || !password) {
+      setLocalError('Fill in every field to create your account.')
       return
     }
-    signIn()
-    navigate('/upload')
+    if (password.length < 6) {
+      setLocalError('Password must be at least 6 characters.')
+      return
+    }
+
+    try {
+      await signUp(email, password, name)
+      navigate('/login')
+    } catch {
+      // error surfaced via useAuth
+    }
   }
 
-  const socialSignUp = () => {
-    signIn()
-    navigate('/upload')
-  }
+  const displayError = localError || error
 
   return (
     <div className="stage auth-page">
       <aside className="auth-aside">
-        <img src="/assets/logo.png" alt="Deepfake Detection" />
+        <img src="./logo.png" alt="Deepfake Detection" />
       </aside>
 
       <main className="auth-main">
         <h1 className="auth-title">Create Account</h1>
 
-        <div className="social-row">
-          <button type="button" className="social-btn" onClick={socialSignUp}>
-            <img src="/assets/icon-google.svg" alt="" />
-            <span>Login with Google</span>
-          </button>
-          <button type="button" className="social-btn" onClick={socialSignUp}>
-            <img src="/assets/icon-facebook.svg" alt="" />
-            <span>Login with Facebook</span>
-          </button>
-        </div>
-
-        <p className="auth-or">- OR -</p>
-
         <form onSubmit={submit}>
           <div className="field">
-            <input name="name" type="text" placeholder="Full Name" autoComplete="name" />
+            <input name="name" type="text" placeholder="Full Name" autoComplete="name" disabled={loading} />
           </div>
 
           <div className="field">
-            <input name="email" type="email" placeholder="Email Address" autoComplete="email" />
+            <input name="email" type="email" placeholder="Email Address" autoComplete="email" disabled={loading} />
           </div>
 
           <div className="field">
@@ -66,6 +63,7 @@ export const CreateAccount: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               autoComplete="new-password"
+              disabled={loading}
             />
             <button
               type="button"
@@ -77,10 +75,10 @@ export const CreateAccount: React.FC = () => {
             </button>
           </div>
 
-          {error && <p className="auth-error">{error}</p>}
+          {displayError && <p className="auth-error">{displayError}</p>}
 
-          <button type="submit" className="btn auth-submit">
-            Create Account
+          <button type="submit" className="btn auth-submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 

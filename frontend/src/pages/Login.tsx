@@ -1,60 +1,57 @@
+// Login.tsx
+
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppState } from '../state/AppState'
 
-/* Figma frame "Log In" (node 3:187): 521px primary panel on the left,
-   form on the right with social buttons, underlined fields and a
-   612×72 submit button. */
 export const Login: React.FC = () => {
   const navigate = useNavigate()
-  const { signIn } = useAppState()
+  const { signIn, error, clearError, loading } = useAppState()
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
+  const [localError, setLocalError] = useState('')
 
-  /* Mock auth: any non-empty pair signs in. */
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLocalError('')
+    clearError()
+
     const form = e.target as HTMLFormElement
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim()
     const password = (form.elements.namedItem('password') as HTMLInputElement).value.trim()
+
     if (!email || !password) {
-      setError('Enter an email address and password to continue.')
+      setLocalError('Enter an email address and password to continue.')
       return
     }
-    signIn()
-    navigate('/upload')
+
+    try {
+      await signIn(email, password)
+      navigate('/upload')
+    } catch {
+      // error surfaced via useAuth
+    }
   }
 
-  const socialSignIn = () => {
-    signIn()
-    navigate('/upload')
-  }
+  const displayError = localError || error
 
   return (
     <div className="stage auth-page">
       <aside className="auth-aside">
-        <img src="/assets/logo.png" alt="Deepfake Detection" />
+        <img src="./logo.png" alt="Deepfake Detection" />
       </aside>
 
       <main className="auth-main">
         <h1 className="auth-title">Log in</h1>
 
-        <div className="social-row">
-          <button type="button" className="social-btn" onClick={socialSignIn}>
-            <img src="/assets/icon-google.svg" alt="" />
-            <span>Login with Google</span>
-          </button>
-          <button type="button" className="social-btn" onClick={socialSignIn}>
-            <img src="/assets/icon-facebook.svg" alt="" />
-            <span>Login with Facebook</span>
-          </button>
-        </div>
-
-        <p className="auth-or">- OR -</p>
-
         <form onSubmit={submit}>
           <div className="field">
-            <input name="email" type="email" placeholder="Email Address" autoComplete="email" />
+            <input
+              name="email"
+              type="email"
+              placeholder="Email Address"
+              autoComplete="email"
+              disabled={loading}
+            />
           </div>
 
           <div className="field">
@@ -63,6 +60,7 @@ export const Login: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               autoComplete="current-password"
+              disabled={loading}
             />
             <button
               type="button"
@@ -74,17 +72,14 @@ export const Login: React.FC = () => {
             </button>
           </div>
 
-          {error && <p className="auth-error">{error}</p>}
+          {displayError && <p className="auth-error">{displayError}</p>}
 
-          <button type="submit" className="btn auth-submit">
-            Log in
+          <button type="submit" className="btn auth-submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Log in'}
           </button>
         </form>
 
-        <div className="auth-links">
-          <p>
-            Forgot <Link to="/login">password?</Link>
-          </p>
+       <div className="auth-links">
           <p>
             Don't have an account? <Link to="/create-account">Create an account</Link>
           </p>

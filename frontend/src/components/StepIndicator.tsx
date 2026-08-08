@@ -1,9 +1,5 @@
 import React from 'react'
 
-/* Three-step tracker from the Figma: 128×115 ellipses joined by
-   arrows. The reached step is filled with --secondary-text (#5D6978),
-   the rest with --placeholder (#D9D9D9). */
-
 const STEPS = [
   { icon: '/assets/icon-file.svg', label: 'Step 1. Upload' },
   { icon: '/assets/icon-clock.svg', label: 'Step 2. Processing' },
