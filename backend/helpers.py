@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import uuid
 
 from firebase_config import db
+from schemas import UserResponse
 
 audit_logs_ref = db.collection("audit_logs")
 
@@ -14,6 +15,23 @@ def now_iso() -> str:
 def generate_id(prefix: str) -> str:
     """Generate a short unique ID with a prefix (e.g., U001, R001)."""
     return f"{prefix}{uuid.uuid4().hex[:8].upper()}"
+
+def user_from_doc(doc_id: str, data: dict | None = None) -> UserResponse:
+    """Build a UserResponse from a Firestore user document."""
+    data = data or {}
+    return UserResponse(
+        id=doc_id,
+        user_id=data.get("user_id") or doc_id,
+        email=data.get("email") or "",
+        display_name=data.get("display_name"),
+        first_name=data.get("first_name") or "",
+        last_name=data.get("last_name") or "",
+        phone=data.get("phone") or data.get("phone_number") or data.get("phoneNumber") or "",
+        auth_provider=data.get("auth_provider") or "local",
+        created_at=data.get("created_at") or "",
+        metadata=data.get("metadata") or {},
+    )
+
 
 def log_event(
     event_type: str,

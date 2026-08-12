@@ -1,6 +1,6 @@
 #backend/schemas.py
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Any
 
 # User creation schema
@@ -14,13 +14,26 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+# Profile update schema
+class ProfileUpdate(BaseModel):
+    first_name: str = ""
+    last_name: str = ""
+    email: str = ""
+    phone: str = ""
+
+
 # User response schema
 class UserResponse(BaseModel):
     """Response body for authenticated user data."""
+    model_config = ConfigDict(extra="ignore")
+
     id: str
     user_id: str
     email: str
     display_name: str | None = None
+    first_name: str = ""
+    last_name: str = ""
+    phone: str = ""
     auth_provider: str
     created_at: str
     metadata: dict[str, Any] = Field(default_factory=dict)
