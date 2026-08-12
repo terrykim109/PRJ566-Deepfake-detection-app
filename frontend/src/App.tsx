@@ -31,9 +31,9 @@ const AppRoutes: React.FC = () => (
 
 const App: React.FC = () => (
   <AppStateProvider>
-    <BrowserRouter>
+    {/* <BrowserRouter> */}
       <AppRoutes />
-    </BrowserRouter>
+    {/* </BrowserRouter> */}
   </AppStateProvider>
 )
 

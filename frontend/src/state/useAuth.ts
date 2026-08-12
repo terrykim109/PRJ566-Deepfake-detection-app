@@ -37,6 +37,7 @@ export interface AuthState {
   token: string | null
   profile: Profile
   loading: boolean
+  saving: boolean
   error: string
 }
 
@@ -48,9 +49,13 @@ export interface AuthActions {
   clearError: () => void
 }
 
+function emptyProfile(): Profile {
+  return { firstName: '', lastName: '', email: '', phone: '' }
+}
+
 /* Build a Profile from the backend user record */
 function buildProfile(user: UserResponse | null): Profile {
-  if (!user) return { firstName: '', lastName: '', email: '', phone: '' }
+  if (!user) return emptyProfile()
   const names = (user.display_name || '').split(' ')
   return {
     firstName: user.first_name || names[0] || '',
@@ -60,19 +65,46 @@ function buildProfile(user: UserResponse | null): Profile {
   }
 }
 
+function applyUser(user: UserResponse, fallback?: Profile | UserResponse | null): UserResponse {
+  const fb = fallback && 'firstName' in fallback
+    ? fallback
+    : fallback
+      ? buildProfile(fallback)
+      : emptyProfile()
+  return {
+    ...user,
+    email: user.email || fb.email || '',
+    first_name: user.first_name || fb.firstName || '',
+    last_name: user.last_name || fb.lastName || '',
+    phone: user.phone || fb.phone || '',
+  }
+}
+
 export function useAuth(): AuthState & AuthActions {
   const stored = loadStored()
   const [user, setUser] = useState<UserResponse | null>(stored.user)
   const [token, setToken] = useState<string | null>(stored.token)
   const [profile, setProfile] = useState<Profile>(buildProfile(stored.user))
   const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (stored.token && stored.user) {
-      setToken(stored.token)
-      setUser(stored.user)
-      setProfile(buildProfile(stored.user))
+    const storedUser = stored.user
+    const storedToken = stored.token
+    if (!storedUser?.user_id || !storedToken) return
+
+    let cancelled = false
+    authApi.me(storedUser.user_id).then((res) => {
+      if (cancelled || !res.data) return
+      const nextUser = applyUser(res.data, storedUser)
+      saveStored(storedToken, nextUser)
+      setToken(storedToken)
+      setUser(nextUser)
+      setProfile(buildProfile(nextUser))
+    })
+    return () => {
+      cancelled = true
     }
   }, [])
 
@@ -88,10 +120,11 @@ export function useAuth(): AuthState & AuthActions {
       throw new Error(res.error)
     }
     const data = res.data!
-    saveStored(data.access_token, data.user)
+    const nextUser = applyUser(data.user)
+    saveStored(data.access_token, nextUser)
     setToken(data.access_token)
-    setUser(data.user)
-    setProfile(buildProfile(data.user))
+    setUser(nextUser)
+    setProfile(buildProfile(nextUser))
     setLoading(false)
   }, [])
 
@@ -105,10 +138,11 @@ export function useAuth(): AuthState & AuthActions {
       throw new Error(res.error)
     }
     const data = res.data!
-    saveStored(data.access_token, data.user)
+    const nextUser = applyUser(data.user)
+    saveStored(data.access_token, nextUser)
     setToken(data.access_token)
-    setUser(data.user)
-    setProfile(buildProfile(data.user))
+    setUser(nextUser)
+    setProfile(buildProfile(nextUser))
     setLoading(false)
   }, [])
 
@@ -118,14 +152,18 @@ export function useAuth(): AuthState & AuthActions {
     clearStored()
     setToken(null)
     setUser(null)
-    setProfile({ firstName: '', lastName: '', email: '', phone: '' })
+    setProfile(emptyProfile())
     setLoading(false)
   }, [user])
 
   /* Update profile — saves to backend AND updates local state */
   const updateProfile = useCallback(async (next: Profile) => {
-    if (!user?.user_id) return
-    setLoading(true)
+    if (!user?.user_id) {
+      const msg = 'You must be logged in to update your profile.'
+      setError(msg)
+      throw new Error(msg)
+    }
+    setSaving(true)
     setError('')
 
     const res = await authApi.updateProfile(user.user_id, {
@@ -137,17 +175,26 @@ export function useAuth(): AuthState & AuthActions {
 
     if (res.error) {
       setError(res.error)
-      setLoading(false)
+      setSaving(false)
       throw new Error(res.error)
     }
 
-    /* Update local user + profile */
-    const updatedUser = { ...user, display_name: `${next.firstName} ${next.lastName}`.trim(), email: next.email }
+    const updatedUser = applyUser(
+      res.data || {
+        ...user,
+        display_name: `${next.firstName} ${next.lastName}`.trim(),
+        email: next.email,
+        first_name: next.firstName,
+        last_name: next.lastName,
+        phone: next.phone,
+      },
+      next,
+    )
     saveStored(token || '', updatedUser)
     setUser(updatedUser)
-    setProfile(next)
-    setLoading(false)
+    setProfile(buildProfile(updatedUser))
+    setSaving(false)
   }, [user, token])
 
-  return { user, token, profile, loading, error, signUp, signIn, signOut, updateProfile, clearError }
+  return { user, token, profile, loading, saving, error, signUp, signIn, signOut, updateProfile, clearError }
 }

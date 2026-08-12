@@ -5,34 +5,47 @@ interface ApiResponse<T> {
   error?: string
 }
 
-async function post<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
+function errorMessage(data: unknown, status: number): string {
+  if (data && typeof data === 'object' && 'detail' in data) {
+    const detail = (data as { detail: unknown }).detail
+    if (typeof detail === 'string') return detail
+    if (Array.isArray(detail)) {
+      return detail
+        .map((item) =>
+          item && typeof item === 'object' && 'msg' in item
+            ? String((item as { msg: unknown }).msg)
+            : JSON.stringify(item),
+        )
+        .join('; ')
+    }
+  }
+  return `Error ${status}`
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<ApiResponse<T>> {
   try {
     const res = await fetch(`${API_BASE}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      ...init,
+      headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
     })
-    const data = await res.json()
-    if (!res.ok) return { error: data.detail || `Error ${res.status}` }
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) return { error: errorMessage(data, res.status) }
     return { data }
   } catch (err) {
     return { error: err instanceof Error ? err.message : 'Network error' }
   }
 }
 
+async function get<T>(path: string): Promise<ApiResponse<T>> {
+  return request<T>(path)
+}
+
+async function post<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
+  return request<T>(path, { method: 'POST', body: JSON.stringify(body) })
+}
+
 async function put<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
-  try {
-    const res = await fetch(`${API_BASE}${path}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    const data = await res.json()
-    if (!res.ok) return { error: data.detail || `Error ${res.status}` }
-    return { data }
-  } catch (err) {
-    return { error: err instanceof Error ? err.message : 'Network error' }
-  }
+  return request<T>(path, { method: 'PUT', body: JSON.stringify(body) })
 }
 
 export interface UserResponse {
@@ -63,6 +76,9 @@ export const authApi = {
   logout: (userId?: string) =>
     post('/api/auth/logout', { user_id: userId }),
 
+  me: (userId: string) =>
+    get<UserResponse>(`/api/auth/me?user_id=${encodeURIComponent(userId)}`),
+
   updateProfile: (userId: string, profile: { first_name?: string; last_name?: string; email?: string; phone?: string }) =>
-    put(`/api/users/${userId}/profile`, profile),
+    put<UserResponse>(`/api/users/${userId}/profile`, profile),
 }
